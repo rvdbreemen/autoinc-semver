@@ -30,10 +30,7 @@ There are two versions of this script, one that can be used for Windows (batch) 
 To use this with VSCode and the Aduino plugin, just goto the arduino.json and add the following line:
 "prebuild": "<script path>/semver-incr-build ./version.h"
 
-For Arduino IDE the pre-build hooks are defined here:
-https://arduino.github.io/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165
-
-And some more about the hooks in Arduino IDE [here](https://forum.arduino.cc/index.php?topic=586019.0)
+How to use the Arduino IDE the pre-build hooks, [read this Arduino documentation](https://arduino.github.io/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165). And [this topic](https://forum.arduino.cc/index.php?topic=586019.0) on the hooks on the forum. 
 
 Change the script to your needs, it's up to you now.
 
