@@ -1,14 +1,14 @@
 # autoinc-semver
 Automatic semantic version number generator
 
-Usage: semver-build.bat e.g. semver-build.bat ./version.h
+Usage: semver-build.bat e.g. ```semver-build.bat ./version.h```
 
 Just use the prebuild option of vscode call this script to increment the build number. 
 It will automatically find the major.minor.patch+build values and then auto increment the buildnumber. 
 Also it will timestamp date and time of the buildprocess into the file.
 This script generates version numbers folloing the Semantic Version 2.0 (See http://semver.org)
 
-It creates a C/C++ compatible file you can include in your aduino sketch to reflect the version number.
+It creates an Adruino C/C++ compatible file you can include in your aduino sketch to reflect the version number.
 
 The content of the file will look something like this: 
 ```C
@@ -24,6 +24,14 @@ The content of the file will look something like this:
 ```
 
 The MAJOR, MINOR and PATCH are set manually. BUILD will auto-increment each time you call the script. TIME and DATE are set to the moment in time you call the script. The VERSION_ONLY, VERSION_NOBUILD and VERSION are all constructed from the previous set of parameters. 
+
+There are two versions of this script, one that can be used for Windows (batch) and one for Linux/MacOS (bash). 
+
+To use this with VSCode and the Aduino plugin, just goto the arduino.json and add the following line:
+"prebuild": "<script path>/semver-incr-build ./version.h"
+
+For Arduino IDE the pre-build hooks are defined here:
+https://arduino.github.io/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165
 
 Change the script to your needs, it's up to you now.
 
