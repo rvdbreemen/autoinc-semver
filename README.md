@@ -28,7 +28,6 @@ The MAJOR, MINOR and PATCH are set manually. BUILD will auto-increment each time
 There are two versions of this script, one that can be used for Windows (batch) and one for Linux/MacOS (bash). 
 
 To use this with VSCode and the Aduino plugin, just goto the arduino.json and add the following line:
-
 ``"prebuild": "<script path>/semver-incr-build ./version.h"``
 
 How to use the Arduino IDE the pre-build hooks, [read this Arduino documentation](https://arduino.github.io/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165). And [this topic](https://forum.arduino.cc/index.php?topic=586019.0) on the hooks on the forum. 
