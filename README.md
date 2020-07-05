@@ -33,6 +33,8 @@ To use this with VSCode and the Aduino plugin, just goto the arduino.json and ad
 For Arduino IDE the pre-build hooks are defined here:
 https://arduino.github.io/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165
 
+And some more about the hooks in Arduino IDE [here](https://forum.arduino.cc/index.php?topic=586019.0)
+
 Change the script to your needs, it's up to you now.
 
 This script is released to the public domain. Enjoy!
