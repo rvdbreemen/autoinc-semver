@@ -23,4 +23,8 @@ The content of the file will look something like this:
 #define _VERSION 2.0.3+41 (04-07-2020)
 ```
 
+The MAJOR, MINOR and PATCH are set manually. BUILD will auto-increment each time you call the script. TIME and DATE are set to the moment in time you call the script. The VERSION_ONLY, VERSION_NOBUILD and VERSION are all constructed from the previous set of parameters. 
+
+Change the script to your needs, it's up to you now.
+
 This script is released to the public domain. Enjoy!
