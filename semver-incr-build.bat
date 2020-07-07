@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem Copyright (c) 2020 Robert van den Breemen - released under MIT license -
+rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
 rem This script auto increment a header file, that can be included in your projects
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
