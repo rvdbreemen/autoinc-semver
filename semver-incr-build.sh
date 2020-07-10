@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+#
 # Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 #
 # This script auto increment a header file, that can be included in your projects
@@ -30,29 +31,31 @@ PATCH=
 BUILD=
 VERSION=
 
-
-# echo Parse %1 for major.minor.patch-build values and parse them
-IFS=' '
-while read -r line
-do
-#	echo "$line"
-	read -ra tokens <<< "$line"
-	val=${tokens[2]//[!0-9]/}
-	case ${tokens[1]} in
-	        _VERSION_MAJOR)
-                   	MAJOR=$val
-			;;
-		_VERSION_MINOR)
-			MINOR=$val
-			;;
-		_VERSION_PATCH)
-			PATCH=$val
-			;;
-		_VERSION_BUILD)
-			BUILD=$val
-			;;
-	esac
-done <"$file"
+if [[ -f "$file" ]]; then
+	echo "Reading the $file"
+	# echo Parse %1 for major.minor.patch-build values and parse them
+	IFS=' '
+	while read -r line
+	do
+	#	echo "$line"
+		read -ra tokens <<< "$line"
+		val=${tokens[2]//[!0-9]/}
+		case ${tokens[1]} in
+				_VERSION_MAJOR)
+						MAJOR=$val
+				;;
+			_VERSION_MINOR)
+				MINOR=$val
+				;;
+			_VERSION_PATCH)
+				PATCH=$val
+				;;
+			_VERSION_BUILD)
+				BUILD=$val
+				;;
+		esac
+	done <"$file"
+fi
 
 if [ "$MAJOR$MINOR$PATCH$BUILD" == "" ] ;  then
         echo "Initializing [$file] to default values:"
