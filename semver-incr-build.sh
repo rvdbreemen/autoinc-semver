@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-#
 # Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 #
 # This script auto increment a header file, that can be included in your projects
