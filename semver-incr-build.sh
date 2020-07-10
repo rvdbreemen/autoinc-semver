@@ -77,11 +77,11 @@ echo "#define _VERSION_MAJOR ${MAJOR}">>$file
 echo "#define _VERSION_MINOR $MINOR">>$file
 echo "#define _VERSION_PATCH $PATCH">>$file
 echo "#define _VERSION_BUILD $BUILD">>$file
-echo "#define _VERSION_DATE $TIMESTAMP">>$file
-echo "#define _VERSION_TIME $Hour:$Minute:$Second">>$file
-echo "#define _VERSION_ONLY $MAJOR.$MINOR.$PATCH">>$file
-echo "#define _VERSION_NOBUILD $MAJOR.$MINOR.$PATCH ($TIMESTAMP)">>$file
-echo "#define _VERSION $VERSION ($TIMESTAMP)">>$file
+echo "#define _VERSION_DATE \"$TIMESTAMP\"">>$file
+echo "#define _VERSION_TIME \"$Hour:$Minute:$Second\"">>$file
+echo "#define _VERSION_ONLY \"$MAJOR.$MINOR.$PATCH\"">>$file
+echo "#define _VERSION_NOBUILD \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP)\"">>$file
+echo "#define _VERSION \"$VERSION ($TIMESTAMP)\"">>$file
 
 # clear version numbers
 MAJOR=

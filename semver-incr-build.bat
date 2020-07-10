@@ -79,11 +79,11 @@ echo #define _VERSION_MAJOR !MAJOR!>>!FILE!
 echo #define _VERSION_MINOR !MINOR!>>!FILE!  
 echo #define _VERSION_PATCH !PATCH!>>!FILE!
 echo #define _VERSION_BUILD !BUILD!>>!FILE!
-echo #define _VERSION_DATE %TIMESTAMP%>>!FILE!
-echo #define _VERSION_TIME %Hour%:%Minute%:%Second%>>!FILE!
-echo #define _VERSION_ONLY %MAJOR%.%MINOR%.%PATCH%>>%FILE%
-echo #define _VERSION_NOBUILD %MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)>>%FILE%
-echo #define _VERSION %VERSION% (%TIMESTAMP%)>>%FILE%
+echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
+echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
+echo #define _VERSION_ONLY "%MAJOR%.%MINOR%.%PATCH%">>%FILE%
+echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>%FILE%
+echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>%FILE%
 
 rem clear version numbers
 set MAJOR=
