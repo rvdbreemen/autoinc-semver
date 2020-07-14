@@ -33,6 +33,11 @@ Simply goto the arduino.json and add the following line to the options:
 
 How to use the Arduino IDE the pre-build hooks, [read this Arduino documentation](https://arduino.github.io/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165). And [this topic](https://forum.arduino.cc/index.php?topic=586019.0) on the hooks on the forum. 
 
+It comes down to this:
+1. Open the ```platform.txt``` in this directory: ```C:\Users\<username>\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.7.1```
+2. Then add the following line to execute the script on each build:   
+```recipe.hooks.sketch.prebuild.0.pattern=D:\<directory location of script>\autoinc-semver\semver-incr-build.bat {build.source.path}\version.h``` 
+
 Change the script to your needs, it's up to you now.
 
 This script is released to enjoy!
