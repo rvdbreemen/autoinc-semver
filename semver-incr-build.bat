@@ -16,9 +16,11 @@ if [%1]==[] (
 	goto end
 )
 
-rem Create timestamp
-for /f %%x in ('wmic path win32_utctime get /format:list ^| findstr "="') do set %%x
-
+rem Create local TZ timestamp
+for /f %%x in ('wmic path win32_localtime get /format:list ^| findstr "="') do set %%x
+rem Do you want UTC TZ timestamp, then use the next line instead
+rem for /f %%x in ('wmic path win32_utctime get /format:list ^| findstr "="') do set %%x
+ 
 set Month=0%Month%
 set Month=%Month:~-2%
 set Day=0%Day%
@@ -84,6 +86,7 @@ echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
 echo #define _VERSION_ONLY "%MAJOR%.%MINOR%.%PATCH%">>%FILE%
 echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>%FILE%
 echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>%FILE%
+echo //The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver>>!FILE!
 
 rem clear version numbers
 set MAJOR=
