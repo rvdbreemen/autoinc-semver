@@ -2,6 +2,8 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
+rem Version  : 0.0.1
+rem 
 rem This script updates the version in your boilerplate. Based on the auto-increment output file.
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
 rem Note: this script does not implement pre-release tagging at this point
