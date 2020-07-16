@@ -91,6 +91,7 @@ set MAJOR=
 set MINOR=
 set PATCH=
 set BUILD=
+set PRERELEASE=
 set VERSION=
 
 set sFilenaam=%~2
@@ -108,24 +109,23 @@ if [%2]==[_VERSION_MAJOR] set /a MAJOR=%3
 if [%2]==[_VERSION_MINOR] set /a MINOR=%3 
 if [%2]==[_VERSION_PATCH] set /a PATCH=%3 
 if [%2]==[_VERSION_BUILD] set /a BUILD=%3 
+if [%2]==[_VERSION_PRERELEASE] set PRERELEASE=%3
 exit /b 0
 
 rem continue here, once you have located the version details
 :next
 rem check if there is a proper version found
-if [%MAJOR%]==[] goto :skip
-if [%MINOR%]==[] goto :skip
-if [%PATCH%]==[] goto :skip
-if [%BUILD%]==[] goto :skip
+if defined MAJOR if defined MINOR if defined PATCH if BUILD goto :found-version
 
+rem Something is wrong, abort abort abort...
+echo Oops, failed to find a valid version number. I did find this: [%MAJOR%.%MINOR%.%PATCH%+%BUILD%]
+goto :the-end
+
+:found-version
 rem this must be it then, next up, find those version boilerplates and update them all to the current version
 call :findthem "!sDirectory!" "!sFilenaam!"
 goto :the-end
 
-:skip
-rem Something is wrong, abort abort abort...
-echo Oops, failed to find a valid version number. I did find this: [%MAJOR%.%MINOR%.%PATCH%+%BUILD%]
-goto :the-end
 
 :findthem
 rem so now lets loop thru all files, and replace any boilerplate version numbers
@@ -134,9 +134,13 @@ rem loop thru all files (not without subdirectories) for %f in (.\*) do @echo %f
 set sDirectory=%~1
 set sFilenaam=%~2
 
-rem if there is no major.minor.patch set, then just setup the defaults
+rem initialize the version string, if prerelease label exists then use it.
 set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
 set _VERSION_ONLY=%MAJOR%.%MINOR%.%PATCH%
+if defined PRERELEASE (
+	set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%
+	set _VERSION_ONLY=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%
+)
 echo In version file: [%sDirectory%] the version(/w build) is [%VERSION%] or (/wo build) [%_VERSION_ONLY%]
 
 
@@ -283,6 +287,7 @@ set MAJOR=
 set MINOR=
 set PATCH=
 set BUILD=
+set PRERELEASE=
 set VERSION=
 set TIMESTAMP=
 
