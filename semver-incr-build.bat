@@ -2,9 +2,11 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
+rem Version : 0.0.2
+
 rem This script auto increment a header file, that can be included in your projects
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
-rem Note: this script does not implement pre-release tagging at this point
+rem 0.0.2: this script does implement pre-release label
 
 setlocal EnableDelayedExpansion
 set FILE=%1
@@ -39,6 +41,7 @@ set MAJOR=
 set MINOR=
 set PATCH=
 set BUILD=
+set PRERELEASE=
 set VERSION=
 
 rem echo Parse %1 for major.minor.patch-build values
@@ -52,6 +55,7 @@ rem three parameters, if the second token is version related, then match and put
 if [%2]==[_VERSION_MAJOR] set /a MAJOR=%3
 if [%2]==[_VERSION_MINOR] set /a MINOR=%3 
 if [%2]==[_VERSION_PATCH] set /a PATCH=%3 
+if [%2]==[_VERSION_PRERELEASE set /a PRERELEASE=%3 
 if [%2]==[_VERSION_BUILD] set /a BUILD=%3 
 exit /b 0
 
@@ -59,21 +63,28 @@ exit /b 0
 rem if there is no major.minor.patch set, then just setup the defaults
 set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
 echo Found version: %VERSION%
-if [%VERSION%]==[..+] (
-  echo Initializing %_file% to default values:
-  set /a MAJOR=0
-  set /a MINOR=0
-  set /a PATCH=0
-  set /a BUILD=0
-  set VERSION=!MAJOR!.!MINOR!.!PATCH!+!BUILD!
-  echo %VERSION%
-)
+if [%MAJOR%}==[] goto:skip
+if [%MINOR%}==[] goto:skip
+if [%PATCH%}==[] goto:skip
+if [%BUILD%}==[] goto:skip
+
+rem Oops, first run, so initialize defaults 0.0.0+0 (no prerelease label)
+echo Initializing %_file% to default values:
+set /a MAJOR=0
+set /a MINOR=0
+set /a PATCH=0
+set /a PRERELEASE=
+set /a BUILD=0
+set VERSION=!MAJOR!.!MINOR!.!PATCH!+!BUILD!
+if defined PRERELEASE set VERSION=!MAJOR!.!MINOR!.!PATCH!-!PRERELEASE!+!BUILD!
+echo Found this version : [%VERSION%]
 
 rem now auto increment build number by 1
 set /a BUILD=BUILD+1
 set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
-echo Increment build %BUILD%
-echo Version is: %VERSION% 
+if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%
+echo Increment build to : [%BUILD%]
+echo Version is now     : [%VERSION%]
   
 rem write the version numbers out to the file
 echo //The version number conforms to semver.org format>!FILE!
@@ -81,11 +92,19 @@ echo #define _VERSION_MAJOR !MAJOR!>>!FILE!
 echo #define _VERSION_MINOR !MINOR!>>!FILE!  
 echo #define _VERSION_PATCH !PATCH!>>!FILE!
 echo #define _VERSION_BUILD !BUILD!>>!FILE!
+echo #define _VERSION_PRERELEASE !PRERELEASE!>>!FILE!
 echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
 echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
-echo #define _VERSION_ONLY "%MAJOR%.%MINOR%.%PATCH%">>%FILE%
-echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>%FILE%
-echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>%FILE%
+echo #define _SEMVER_CORE "%MAJOR%.%MINOR%.%PATCH%">>!FILE!
+echo #define _SEMVER_BUILD "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+if defined PRERELEASE (
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%">>!FILE!
+  echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
+) else (
+  echo #define _VERSION_FULL "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+  echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
+)
+echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
 echo //The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver>>!FILE!
 
 rem clear version numbers
@@ -93,6 +112,7 @@ set MAJOR=
 set MINOR=
 set PATCH=
 set BUILD=
+set PRERELEASE=
 set VERSION=
 set TIMESTAMP=
 
