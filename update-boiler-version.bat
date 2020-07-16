@@ -2,7 +2,7 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version  : 0.0.4
+rem Version  : 0.0.5
 rem 
 rem This script updates the version in your boilerplate. Based on the auto-increment output file.
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
@@ -19,48 +19,40 @@ rem the replaced version text is, and later on we add the Version number we foun
 set "sReplace=**  Version  : v"
 
 rem lets check the directory and the filename
+echo [%cd%] [%1] [%2]
 set sDirectory=%~1
 set aDirectory=%~a1
 set sFilenaam=%2
 
-rem echo [%aDirectory%] [%sDirectory%] [%sFilenaam%]
+rem remove leading "." and ".." and "\" stick %cd% in front and add trailing "\" 
+if "%sDirectory:~0,2%"==".." set sDirectory=%sDirectory:~2%
+if "%sDirectory:~0,1%"=="." set sDirectory=%sDirectory:~1%
+if "%sDirectory:~0,1%"=="\"	set sDirectory=!cd!!sDirectory!
+if not "%sDirectory:~-1%"=="\" set sDirectory=!sDirectory!\
+if not "%sDirectory:~1,1%"==":" set sDirectory=!cd!\!sDirectory!
 
-rem if 'it' is not existing then explain 
-if not defined aDirectory (
-	echo This [%sDirectory%] does not exist at all.
-	echo Argh, let me explain this again.
-	echo. 
-	goto :explain-use
-	exit /b
-)
-
-if not [%aDirectory%] == [d----------] (
-	echo This [%sDirectory%] is not a directory.
+call :directory-exist !sDirectory!
+if errorlevel 1 (
+	echo This [!sDirectory!] is not a directory.
 	echo Maybe, you forgot how to use this script.
 	echo.
 	goto :explain-use
-	) else (
-	rem echo [%sDirectory%] is a directory 
-	if "%sDirectory:~-1%" NEQ "\" (
-		set sDirectory=%sDirectory%\
-		rem echo [!sDirectory!] added a backslash
-	)
-)
+) 
+pushd
+cd !sDirectory!
 rem we have liftoff, the directory exists.
 rem next up, lets check if you gave us a version file.
 
-:check-version-file 
+rem :check-version-file 
 rem If there is no file given as parameter, then print help text
-if defined sFilenaam if not exist "%sDirectory%%sFilenaam%" (
+if defined sFilenaam if not exist "!sDirectory!%sFilenaam%" (
 	echo File [%sFilenaam%] does not exist the directory you try to process.
 	echo To make this work, you do need a version-file created by my script.
 	echo. 
 	goto :explain-use
 ) 
-
-if "%sFilenaam%"=="" set sFilenaam=version.h 
-
-if not exist "%sDirectory%%sFilenaam%" (
+if "!sFilenaam!"=="" set sFilenaam=version.h 
+if not exist "!sDirectory!!sFilenaam!" (
 	echo Missing a version header file to process in the directory.
 	echo This only works if you use the version.h file created by my script.
 	echo. 
@@ -68,8 +60,10 @@ if not exist "%sDirectory%%sFilenaam%" (
 ) else (
 	set sFilenaam=version.h 
 )
+
 rem yeah, let's hunt for the version information next
-goto :lets-find-version
+call :lets-find-version "!sDirectory!" "!sFilenaam!"
+goto :the-end
 
 :explain-use
 echo This script updates the version in the boilerplate of all files.
@@ -85,8 +79,11 @@ set PATCH=
 set BUILD=
 set VERSION=
 
+set sFilenaam=%~2
+set sDirectory=%~1
+
 rem echo Parse "version file" for major.minor.patch-build values
-for /F "usebackq delims=*" %%A in (%sDirectory%%sFile%) do ( 
+for /F "usebackq delims=*" %%A in (!sDirectory!!sFilenaam!) do ( 
 	call :parse %%A 
 ) 
 goto :next
@@ -108,7 +105,8 @@ if [%PATCH%]==[] goto :skip
 if [%BUILD%]==[] goto :skip
 
 rem this must be it then, next up, find those version boilerplates and update them all to the current version
-goto :findthem
+call :findthem "!sDirectory!" "!sFilenaam!"
+goto :the-end
 
 :skip
 rem Something is wrong, abort abort abort...
@@ -119,14 +117,20 @@ goto :the-end
 rem so now lets loop thru all files, and replace any boilerplate version numbers
 rem loop thru all files (not without subdirectories) for %f in (.\*) do @echo %f
 
-rem create a checkpoint
-git commit -a -q --allow-empty-message
-git tag auto-update-version
+set sDirectory=%~1
+set sFilenaam=%~2
 
 rem if there is no major.minor.patch set, then just setup the defaults
 set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
 set _VERSION_ONLY=%MAJOR%.%MINOR%.%PATCH%
-echo In version file: [%sDirectory%%sFile%] the version(/w build) is [%VERSION%] or (/wo build) [%_VERSION_ONLY%]
+echo In version file: [%sDirectory%] the version(/w build) is [%VERSION%] or (/wo build) [%_VERSION_ONLY%]
+
+
+rem create a checkpoint
+echo Commit changes here: [%cd%] 
+git add %sDirectory%>nul 2>&1
+git commit -a -q -m "before update %_VERSION_ONLY%">nul 2>&1
+git tag auto-update-version >nul 2>&1
 
 setlocal enableextensions enabledelayedexpansion
 
@@ -144,7 +148,7 @@ for /r "%sDirectory%" %%P in ("*") do (
 	set _FILENAAM=!_FILENAAM! "%%~nP%%~xP"
 	set _EXTENTION=!_EXTENTION! "%%~xP"
 	set _PAD_FILENAAM="!%%~dP%%~P!"
-	rem echo !_PAD! !_FILENAAM! !_EXTENTION! !_PAD_FILENAAM!
+	rem echo 2 !_PAD! !_FILENAAM! !_EXTENTION! !_PAD_FILENAAM!
 	call :skip_hidden_directory !_PAD!
 	if errorlevel 0 call :find-extention !_PAD! !_FILENAAM! !_EXTENTION! !_PAD_FILENAAM!
 	rem clean up after youself
@@ -154,8 +158,10 @@ for /r "%sDirectory%" %%P in ("*") do (
 	set _PAD_FILENAAM=
     ) 
 	rem and put it back to git
-	git commit -a -q --allow-empty-message 
-	git tag %_VERSION_ONLY%
+	echo Git commit tag [%_VERSION_ONLY%]
+	git add !_PAD!>nul 2>&1
+	git commit -a -q -m "update version to %_VERSION_ONLY%">nul 2>&1
+	git tag %_VERSION_ONLY%>nul 2>&1
 	echo Done updating... 
 	
 	endlocal 
@@ -163,10 +169,17 @@ goto :the-end
 
 
 rem ======= now some routines follow =======
+:directory-exist
+	set sDirectory=%~1
+	set aDirectory=%~a1
+	if (%aDirectory%) == (d----------) exit /b 0
+	if (%aDirectory%) == (d--h-------) exit /b 0
+	exit /b 1
+	
 :skip_hidden_directory
 	set sDirectory=%~1
 	set aDirectory=%~a1
-	if [%aDirectory%] == [d--h-------] exit /b 1
+	if (%aDirectory%) == (d--h-------) exit /b 1
 	exit /b 0
 	
 :find-extention
@@ -252,6 +265,8 @@ for %%I in ("%~f1\*.*") do exit /b 1
 exit /b 0
 
 :the-end
+rem go back to start
+popd
 rem clear version numbers
 set MAJOR=
 set MINOR=
