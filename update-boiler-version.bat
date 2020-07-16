@@ -2,7 +2,7 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version  : 0.0.3
+rem Version  : 0.0.4
 rem 
 rem This script updates the version in your boilerplate. Based on the auto-increment output file.
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
@@ -120,7 +120,7 @@ rem so now lets loop thru all files, and replace any boilerplate version numbers
 rem loop thru all files (not without subdirectories) for %f in (.\*) do @echo %f
 
 rem create a checkpoint
-git commit -a --allow-empty-message
+git commit -a -q --allow-empty-message
 git tag auto-update-version
 
 rem if there is no major.minor.patch set, then just setup the defaults
@@ -154,7 +154,7 @@ for /r "%sDirectory%" %%P in ("*") do (
 	set _PAD_FILENAAM=
     ) 
 	rem and put it back to git
-	git commit -a --allow-empty-message
+	git commit -a -q --allow-empty-message 
 	git tag %_VERSION_ONLY%
 	echo Done updating... 
 	
