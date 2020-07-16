@@ -2,7 +2,7 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version  : 0.0.5
+rem Version  : 0.0.7
 rem 
 rem This script updates the version in your boilerplate. Based on the auto-increment output file.
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
@@ -14,22 +14,36 @@ rem ** next line defines file extentions that will be updated.
 set ext_list=.ino .h .c .cpp .js .css .html .inc 
 
 rem next line is the pattern for the "version" line, it will find it and update it.
-set "sSearch=^\*\*.*Version..:.v[0-9]\.[0-9]\.[0-9].*$"
-rem the replaced version text is, and later on we add the Version number we found
-set "sReplace=**  Version  : v"
+set "sSearch=(?<pre>^\*\*.*Version..:.v)([0-9]\.[0-9]\.[0-9])(?<post>.*$)"
+rem the replaced version text = "$[pre}%VERSION_ONLY%${post}"
 
 rem lets check the directory and the filename
-echo [%cd%] [%1] [%2]
 set sDirectory=%~1
 set aDirectory=%~a1
 set sFilenaam=%2
 
+set Debug=
 rem remove leading "." and ".." and "\" stick %cd% in front and add trailing "\" 
+if defined Debug echo 0 !sDirectory!
+if not defined sDirectory (
+	set sDirectory=%cd%
+	echo Updating current directory: [!sDirectory!]
+)
+if "%sDirectory%"=="."	set sDirectory=%cd%
+if defined Debug echo 1 !sDirectory!
+if "%sDirectory%"==".." set sDirectory=%cd%\!sDirectory!
+if defined Debug echo 2 !sDirectory!
 if "%sDirectory:~0,2%"==".." set sDirectory=%sDirectory:~2%
+if defined Debug echo 3 !sDirectory!
 if "%sDirectory:~0,1%"=="." set sDirectory=%sDirectory:~1%
+if defined Debug echo 4 !sDirectory!
 if "%sDirectory:~0,1%"=="\"	set sDirectory=!cd!!sDirectory!
+if defined Debug echo 5 !sDirectory!
 if not "%sDirectory:~-1%"=="\" set sDirectory=!sDirectory!\
+if defined Debug echo 6 !sDirectory!
 if not "%sDirectory:~1,1%"==":" set sDirectory=!cd!\!sDirectory!
+if defined Debug echo 7 !sDirectory!
+if defined Debug pause
 
 call :directory-exist !sDirectory!
 if errorlevel 1 (
@@ -170,14 +184,11 @@ goto :the-end
 
 rem ======= now some routines follow =======
 :directory-exist
-	set sDirectory=%~1
 	set aDirectory=%~a1
-	if (%aDirectory%) == (d----------) exit /b 0
-	if (%aDirectory%) == (d--h-------) exit /b 0
+	if (%aDirectory:~0,1%) == (d) exit /b 0
 	exit /b 1
 	
 :skip_hidden_directory
-	set sDirectory=%~1
 	set aDirectory=%~a1
 	if (%aDirectory%) == (d--h-------) exit /b 1
 	exit /b 0
@@ -217,13 +228,13 @@ rem make backup first
 set $src=%_PAD_FILENAAM%
 set $dst=%_PAD_FILENAAM%.tmp 
 
-rem set "search=^\*\*.*Version..:.v[0-9]\.[0-9]\.[0-9]"
-rem set "replace=**  Version  : v%_VERSION_ONLY%"
+rem ** search and replace expressions **
+rem set "search=(?<pre>^\*\*.*Version..:.v)([0-9]\.[0-9]\.[0-9])(?<post>.*$)"
 set "search=%sSearch%"
-set "replace=%sReplace%%_VERSION_ONLY%"
-rem echo %$src% %$dst% [%search%] [%replace%]
+set "replace=${pre}%_VERSION_ONLY%${post}"		
+rem echo Updating: %$src%
+echo "Updating: [%$src%] [%$dst%] [%search%] [%replace%]"
 rem pause
-echo Updating: %$src%
 for /f "delims=" %%a in ('powershell -c "(get-content '%$src%') | foreach-object {$_ -replace '%search%', '%replace%'} | set-content '%$dst%'"') do echo %%a
 
 rem if there is an updates ($dst) then move to ($src)
