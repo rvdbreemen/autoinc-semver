@@ -44,6 +44,7 @@ set BUILD=
 set PRERELEASE=
 set VERSION=
 
+if not exist %file% goto :initialize
 rem echo Parse %1 for major.minor.patch-build values
 for /F "usebackq delims=*" %%A in (%file%) do ( 
 	call :parse %%A 
@@ -52,31 +53,31 @@ goto :next
 
 :parse
 rem three parameters, if the second token is version related, then match and put in in the right verion
+set sTmp=%1
+if "%sTmp:~0,2%"=="//" exit /b 0
 if [%2]==[_VERSION_MAJOR] set /a MAJOR=%3
 if [%2]==[_VERSION_MINOR] set /a MINOR=%3 
 if [%2]==[_VERSION_PATCH] set /a PATCH=%3 
-if [%2]==[_VERSION_PRERELEASE] set /a PRERELEASE=%3 
 if [%2]==[_VERSION_BUILD] set /a BUILD=%3 
+if [%2]==[_VERSION_PRERELEASE] set PRERELEASE=%3
 exit /b 0
 
 :next
 rem if there is no major.minor.patch set, then just setup the defaults
-set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
-echo Found version: %VERSION%
-if [%MAJOR%}==[] goto:skip
-if [%MINOR%}==[] goto:skip
-if [%PATCH%}==[] goto:skip
-if [%BUILD%}==[] goto:skip
+if defined MAJOR if defined MINOR if defined PATCH if defined BUILD goto :found-version
 
+:initialize
 rem Oops, first run, so initialize defaults 0.0.0+0 (no prerelease label)
 echo Initializing %_file% to default values:
 set /a MAJOR=0
 set /a MINOR=0
 set /a PATCH=0
-set /a PRERELEASE=
 set /a BUILD=0
-set VERSION=!MAJOR!.!MINOR!.!PATCH!+!BUILD!
-if defined PRERELEASE set VERSION=!MAJOR!.!MINOR!.!PATCH!-!PRERELEASE!+!BUILD!
+set PRERELEASE=
+
+:found-version
+set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
+if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%
 echo Found this version : [%VERSION%]
 
 rem now auto increment build number by 1
@@ -92,7 +93,7 @@ echo #define _VERSION_MAJOR !MAJOR!>>!FILE!
 echo #define _VERSION_MINOR !MINOR!>>!FILE!  
 echo #define _VERSION_PATCH !PATCH!>>!FILE!
 echo #define _VERSION_BUILD !BUILD!>>!FILE!
-echo #define _VERSION_PRERELEASE !PRERELEASE!>>!FILE!
+if defined PRERELEASE (echo #define _VERSION_PRERELEASE !PRERELEASE!>>!FILE!) else (echo //#define _VERSION_PRERELEASE beta  //uncomment to define prerelease labels: alpha - beta - rc>>!FILE!)
 echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
 echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
 echo #define _SEMVER_CORE "%MAJOR%.%MINOR%.%PATCH%">>!FILE!
