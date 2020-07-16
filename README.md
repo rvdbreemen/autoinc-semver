@@ -38,7 +38,20 @@ It comes down to this:
 2. Then add the following line to execute the script on each build:   
 ```recipe.hooks.sketch.prebuild.0.pattern=D:\<directory location of script>\autoinc-semver\semver-incr-build.bat {build.source.path}\version.h``` 
 
-Change the script to your needs, it's up to you now.
+
+# update-boiler-version
+To update my source files, I created another script. It looks for the signature of the "version" boiler plate
+and then replaces it with the version found in the version header file. Before it makes any changes, it commits
+to github. Then it updates all the relevant source files to the current version. To finally commit and tag with
+the current version.
+
+To modify it to your needs, just go and change it in the file itself. If you like to live dangerous, then you 
+could do without github (not recommended). Otherwise, just enjoy the magic of auto-semver and this script. 
+
+If anyone enjoys writting in bash, please do a pull request to get it added.
+
+
+Change the scripts to your needs, it's up to you now.
 
 This script is released to enjoy!
 
