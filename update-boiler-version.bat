@@ -2,7 +2,7 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version  : 0.0.7
+rem Version  : 0.0.9
 rem 
 rem This script updates the version in your boilerplate. Based on the auto-increment output file.
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
@@ -232,8 +232,8 @@ rem ** search and replace expressions **
 rem set "search=(?<pre>^\*\*.*Version..:.v)([0-9]\.[0-9]\.[0-9])(?<post>.*$)"
 set "search=%sSearch%"
 set "replace=${pre}%_VERSION_ONLY%${post}"		
-rem echo Updating: %$src%
-echo "Updating: [%$src%] [%$dst%] [%search%] [%replace%]"
+
+if defined Debug (echo "Updating: [%$src%] [%$dst%] [%search%] [%replace%]") else (echo Updating: %$src%)
 rem pause
 for /f "delims=" %%a in ('powershell -c "(get-content '%$src%') | foreach-object {$_ -replace '%search%', '%replace%'} | set-content '%$dst%'"') do echo %%a
 
