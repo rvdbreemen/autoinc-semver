@@ -55,7 +55,7 @@ rem three parameters, if the second token is version related, then match and put
 if [%2]==[_VERSION_MAJOR] set /a MAJOR=%3
 if [%2]==[_VERSION_MINOR] set /a MINOR=%3 
 if [%2]==[_VERSION_PATCH] set /a PATCH=%3 
-if [%2]==[_VERSION_PRERELEASE set /a PRERELEASE=%3 
+if [%2]==[_VERSION_PRERELEASE] set /a PRERELEASE=%3 
 if [%2]==[_VERSION_BUILD] set /a BUILD=%3 
 exit /b 0
 
@@ -99,10 +99,10 @@ echo #define _SEMVER_CORE "%MAJOR%.%MINOR%.%PATCH%">>!FILE!
 echo #define _SEMVER_BUILD "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
 if defined PRERELEASE (
   echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%">>!FILE!
-  echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
+  echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
 ) else (
-  echo #define _VERSION_FULL "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
-  echo #define _VERSION_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+  echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
 )
 echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
 echo //The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver>>!FILE!
