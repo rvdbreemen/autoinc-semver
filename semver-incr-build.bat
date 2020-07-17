@@ -16,7 +16,7 @@ rem If there is no file given as parameter, then print help text
 if [%1]==[] (
 	echo To auto increment build number and date stamp, just give filename
 	echo Usage: %0 ^<filename^>
-	goto end
+	goto :eof
 )
 
 rem Create local TZ timestamp
