@@ -99,12 +99,13 @@ echo #define _SEMVER_BUILD "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
 if defined PRERELEASE (
   echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
-  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
 ) else (
-  echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+  echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
+)
 echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
 echo //The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver>>!FILE!
-)
+
 rem after writing tell us what you wrote
 echo Version is now     : [%VERSION%]
 rem clear version numbers
