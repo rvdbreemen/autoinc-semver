@@ -10,8 +10,11 @@ rem Note: this script does not implement pre-release tagging at this point
 
 setlocal EnableDelayedExpansion
 
+rem To debug this script, just set to 1
+set Debug=1
+
 rem test if Git is available, if so, use it to check in projects
-where git.exe >NUL 2>&1 && set /a GitAvailable=1
+where git.exe >NUL 2>&1 && set GitAvailable=true\
 
 rem ** next line defines file extentions that will be updated.
 set ext_list=.ino .h .c .cpp .js .css .html .inc 
@@ -25,7 +28,7 @@ set sDirectory=%~1
 set aDirectory=%~a1
 set sFilenaam=%2
 
-set Debug=
+
 rem remove leading "." and ".." and "\" stick %cd% in front and add trailing "\" 
 if defined Debug echo 0 !sDirectory!
 if not defined sDirectory (
@@ -170,20 +173,9 @@ for /r "%sDirectory%" %%P in ("*") do (
 	set _FILENAAM=
 	set _EXTENTION=
 	set _PAD_FILENAAM=
-    ) 
-
-	if defined GitAvailable (
-		rem and put it back to git
-		echo Git commit tag [%_VERSION_ONLY%]
-		git add !_PAD!>nul 2>&1
-		git commit -a -q -m "update version to %_VERSION_ONLY%">nul 2>&1
-		git tag %_VERSION_ONLY%>nul 2>&1
-	)
-	
-	echo Done updating... 
-	
+    )
 	endlocal 
-goto :the-end
+exit /b 0
 
 
 rem ======= now some routines follow =======
@@ -280,6 +272,15 @@ for %%I in ("%~f1\*.*") do exit /b 1
 exit /b 0
 
 :the-end
+rem the final step
+if defined GitAvailable (
+		rem and put it back to git
+		echo Git commit tag [%_VERSION_ONLY%]
+		git add !_PAD!>nul 2>&1
+		git commit -a -q -m "update version to %_VERSION_ONLY%">nul 2>&1
+		git tag %_VERSION_ONLY%>nul 2>&1
+	)
+	
 rem go back to start
 popd
 rem clear version numbers
@@ -292,7 +293,8 @@ set VERSION=
 set TIMESTAMP=
 set GitAvailable=
 
-exit /b 0 
+echo Done updating... 
+
 
 rem =================================================================================
 rem MIT License
