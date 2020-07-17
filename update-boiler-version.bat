@@ -235,7 +235,7 @@ set $dst=%_PAD_FILENAAM%.tmp
 rem ** search and replace expressions **
 rem set "search=(?<pre>^\*\*.*Version..:.v)([0-9]\.[0-9]\.[0-9])(?<post>.*$)"
 set "search=%sSearch%"
-set "replace=${pre}%_VERSION_ONLY%${post}"		
+set "replace=${pre}%_VERSION_ONLY%"		
 
 if defined Debug (echo "Updating: [%$src%] [%$dst%] [%search%] [%replace%]") else (echo Updating: %$src%)
 rem pause
