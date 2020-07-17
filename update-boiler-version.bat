@@ -2,13 +2,16 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version  : 0.0.9
+rem Version  : 0.1.5
 rem 
 rem This script updates the version in your boilerplate. Based on the auto-increment output file.
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
 rem Note: this script does not implement pre-release tagging at this point
 
 setlocal EnableDelayedExpansion
+
+rem test if Git is available, if so, use it to check in projects
+where git.exe >NUL 2>&1 && set /a GitAvailable=1
 
 rem ** next line defines file extentions that will be updated.
 set ext_list=.ino .h .c .cpp .js .css .html .inc 
@@ -52,59 +55,65 @@ if errorlevel 1 (
 	echo.
 	goto :explain-use
 ) 
+rem echo Finding the version information in [!sDirectory!]
 pushd
 cd !sDirectory!
 rem we have liftoff, the directory exists.
 rem next up, lets check if you gave us a version file.
 
-rem :check-version-file 
 rem If there is no file given as parameter, then print help text
-if defined sFilenaam if not exist "!sDirectory!%sFilenaam%" (
-	echo File [%sFilenaam%] does not exist the directory you try to process.
-	echo To make this work, you do need a version-file created by my script.
-	echo. 
-	goto :explain-use
-) 
-if "!sFilenaam!"=="" set sFilenaam=version.h 
-if not exist "!sDirectory!!sFilenaam!" (
-	echo Missing a version header file to process in the directory.
-	echo This only works if you use the version.h file created by my script.
-	echo. 
-	goto :explain-use
-) else (
-	set sFilenaam=version.h 
-)
+if not defined sFilenaam set sFilenaam=version.h
+if defined Debug (echo Trying to find [!sFilenaam!])
 
-rem yeah, let's hunt for the version information next
-call :lets-find-version "!sDirectory!" "!sFilenaam!"
-goto :the-end
+if exist "!sDirectory!!sFilenaam!" goto :lets-find-version "!sDirectory!" "!sFilenaam!"
+
+echo File [%sFilenaam%] does not exist the directory you try to process.
+echo To make this work, you do need a version-file created by my script.
+echo. 
 
 :explain-use
 echo This script updates the version in the boilerplate of all files.
 echo Usage: %0 ^<directory update^> [optional:^<filename of version.h^>] 
-goto :eof
+goto :the-end
 
-:lets-find-version 
+:lets-find-version
+if defined Debug echo Let's find version information in [!sFilenaam!] located here [!sDirectory!] 
+rem echo Let's find version information in [%1] located here [%2]
 rem Let's begin with finding the 
 rem clear version numbers
-set MAJOR=
 set MINOR=
 set PATCH=
 set BUILD=
 set PRERELEASE=
 set VERSION=
 
-set sFilenaam=%~2
-set sDirectory=%~1
+rem set sFilenaam=%~2
+rem set sDirectory=%~1
 
 rem echo Parse "version file" for major.minor.patch-build values
 for /F "usebackq delims=*" %%A in (!sDirectory!!sFilenaam!) do ( 
 	call :parse %%A 
 ) 
-goto :next
+rem check if there is a proper version found
+if defined MAJOR if defined MINOR if defined PATCH if defined BUILD goto :found-version
+
+:error-no-valid-version
+rem Something is wrong, abort abort abort...
+echo Oops, failed to find a valid version number. I did find this: [%MAJOR%.%MINOR%.%PATCH%+%BUILD%]
+goto :the-end
+
+:found-version
+if defined Debug echo "Valid version numer information found! [%MAJOR%.%MINOR%.%PATCH%+%BUILD%]"
+rem this must be it then, next up, find those version boilerplates and update them all to the current version
+call :findthem "!sDirectory!" "!sFilenaam!"
+goto :the-end
 
 :parse
 rem three parameters, if the second token is version related, then match and put in in the right verion
+if defined Debug (echo Parsing for version  information [%1] [%2] [%3])
+rem ignore comment lines that start with //
+set sTmp=%1
+if "%sTmp:~0,2%"=="//" exit /b 0
 if [%2]==[_VERSION_MAJOR] set /a MAJOR=%3
 if [%2]==[_VERSION_MINOR] set /a MINOR=%3 
 if [%2]==[_VERSION_PATCH] set /a PATCH=%3 
@@ -112,22 +121,8 @@ if [%2]==[_VERSION_BUILD] set /a BUILD=%3
 if [%2]==[_VERSION_PRERELEASE] set PRERELEASE=%3
 exit /b 0
 
-rem continue here, once you have located the version details
-:next
-rem check if there is a proper version found
-if defined MAJOR if defined MINOR if defined PATCH if BUILD goto :found-version
-
-rem Something is wrong, abort abort abort...
-echo Oops, failed to find a valid version number. I did find this: [%MAJOR%.%MINOR%.%PATCH%+%BUILD%]
-goto :the-end
-
-:found-version
-rem this must be it then, next up, find those version boilerplates and update them all to the current version
-call :findthem "!sDirectory!" "!sFilenaam!"
-goto :the-end
-
-
 :findthem
+if defined PRERELEASE (echo Found: [%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%]) else (echo Found: [%MAJOR%.%MINOR%.%PATCH%+%BUILD%])
 rem so now lets loop thru all files, and replace any boilerplate version numbers
 rem loop thru all files (not without subdirectories) for %f in (.\*) do @echo %f
 
@@ -141,14 +136,15 @@ if defined PRERELEASE (
 	set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%
 	set _VERSION_ONLY=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%
 )
-echo In version file: [%sDirectory%] the version(/w build) is [%VERSION%] or (/wo build) [%_VERSION_ONLY%]
+if defined Debug echo In version file: [%sDirectory%] the version(/w build) is [%VERSION%] or (/wo build) [%_VERSION_ONLY%]
 
-
-rem create a checkpoint
-echo Commit changes here: [%cd%] 
-git add %sDirectory%>nul 2>&1
-git commit -a -q -m "before update %_VERSION_ONLY%">nul 2>&1
-git tag auto-update-version >nul 2>&1
+if defined GitAvailable (
+	rem create a checkpoint
+	echo Commit changes here: [%cd%] 
+	git add %sDirectory%>nul 2>&1
+	git commit -a -q -m "before update %_VERSION_ONLY%">nul 2>&1
+	git tag auto-update-version >nul 2>&1
+)
 
 setlocal enableextensions enabledelayedexpansion
 
@@ -175,11 +171,15 @@ for /r "%sDirectory%" %%P in ("*") do (
 	set _EXTENTION=
 	set _PAD_FILENAAM=
     ) 
-	rem and put it back to git
-	echo Git commit tag [%_VERSION_ONLY%]
-	git add !_PAD!>nul 2>&1
-	git commit -a -q -m "update version to %_VERSION_ONLY%">nul 2>&1
-	git tag %_VERSION_ONLY%>nul 2>&1
+
+	if defined GitAvailable (
+		rem and put it back to git
+		echo Git commit tag [%_VERSION_ONLY%]
+		git add !_PAD!>nul 2>&1
+		git commit -a -q -m "update version to %_VERSION_ONLY%">nul 2>&1
+		git tag %_VERSION_ONLY%>nul 2>&1
+	)
+	
 	echo Done updating... 
 	
 	endlocal 
@@ -187,7 +187,7 @@ goto :the-end
 
 
 rem ======= now some routines follow =======
-:directory-exist
+:directory-exist 
 	set aDirectory=%~a1
 	if (%aDirectory:~0,1%) == (d) exit /b 0
 	exit /b 1
@@ -290,8 +290,9 @@ set BUILD=
 set PRERELEASE=
 set VERSION=
 set TIMESTAMP=
+set GitAvailable=
 
-goto :eof
+exit /b 0 
 
 rem =================================================================================
 rem MIT License

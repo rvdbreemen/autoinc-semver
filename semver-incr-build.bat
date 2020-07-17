@@ -2,11 +2,12 @@
 rem 
 rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version : 0.0.2
-
+rem Version : 0.1.5
+rem 
 rem This script auto increment a header file, that can be included in your projects
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
-rem 0.0.2: this script does implement pre-release label
+rem 0.1.2: this script does implement pre-release label
+rem 0.1.3: minor improvement and fixes
 
 setlocal EnableDelayedExpansion
 set FILE=%1
@@ -49,7 +50,8 @@ rem echo Parse %1 for major.minor.patch-build values
 for /F "usebackq delims=*" %%A in (%file%) do ( 
 	call :parse %%A 
 ) 
-goto :next
+rem if there is no major.minor.patch set, then just setup the defaults
+if defined MAJOR if defined MINOR if defined PATCH if defined BUILD (goto :found-version) else (goto :initialize)
 
 :parse
 rem three parameters, if the second token is version related, then match and put in in the right verion
@@ -61,10 +63,6 @@ if [%2]==[_VERSION_PATCH] set /a PATCH=%3
 if [%2]==[_VERSION_BUILD] set /a BUILD=%3 
 if [%2]==[_VERSION_PRERELEASE] set PRERELEASE=%3
 exit /b 0
-
-:next
-rem if there is no major.minor.patch set, then just setup the defaults
-if defined MAJOR if defined MINOR if defined PATCH if defined BUILD goto :found-version
 
 :initialize
 rem Oops, first run, so initialize defaults 0.0.0+0 (no prerelease label)
