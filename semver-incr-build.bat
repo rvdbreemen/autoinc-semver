@@ -22,7 +22,6 @@ if [%1]==[] (
 
 rem Fetch githash of current commit
 for /f "delims=" %%a in ('git rev-parse --short HEAD') do set GITHASH=%%a
-echo %GITHASH%
 rem Create local TZ timestamp
 for /f %%x in ('wmic path win32_localtime get /format:list ^| findstr "="') do set %%x
 rem Do you want UTC TZ timestamp, then use the next line instead
