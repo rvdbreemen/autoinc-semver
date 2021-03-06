@@ -2,13 +2,13 @@
 rem 
 rem Copyright (c) 2021 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version : 0.1.6
+rem Version : 0.1.7
 rem 
 rem This script auto increment a header file, that can be included in your projects
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
 rem 0.1.2: this script does implement pre-release label
 rem 0.1.3: minor improvement and fixes
-rem 0.1.4: added githash
+rem 0.1.7: added githash
 
 setlocal EnableDelayedExpansion
 set FILE=%1
