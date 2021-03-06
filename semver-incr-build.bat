@@ -79,14 +79,14 @@ set PRERELEASE=
 set GITHASH=
 
 :found-version
-set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%-%BUILD%
-if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%-%BUILD%
+set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%
+if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%
 echo Found this version : [%VERSION%]
 
 rem now auto increment build number by 1
 set /a BUILD=BUILD+1
-set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%-%BUILD%
-if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%+%BUILD%
+set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%
+if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%
 echo Increment build to : [%BUILD%]
 
   
@@ -102,12 +102,13 @@ echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
 echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
 echo #define _SEMVER_CORE "%MAJOR%.%MINOR%.%PATCH%">>!FILE!
 echo #define _SEMVER_BUILD "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+echo #define _SEMVER_GITHASH "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%">>!FILE!
 
 if defined PRERELEASE (
-  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%">>!FILE!
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
 ) else (
-  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%-%BUILD%">>!FILE!
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
 )
 echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
