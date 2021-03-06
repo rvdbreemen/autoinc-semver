@@ -80,13 +80,13 @@ set GITHASH=
 :found-version
 set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%
 if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%
-echo Found this version : [%VERSION%]
+echo Found this version : [%VERSION%]-[%BUILD%]
 
 rem now auto increment build number by 1
 set /a BUILD=BUILD+1
 set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%
 if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%
-echo Increment build to : [%BUILD%]
+REM echo Increment build to : [%BUILD%]
 
   
 rem write the version numbers out to the file
@@ -114,7 +114,7 @@ echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
 echo //The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver>>!FILE!
 
 rem after writing tell us what you wrote
-echo Version is now     : [%VERSION%]
+echo Version is now     : [%VERSION%]-[%BUILD%]
 rem clear version numbers
 set MAJOR=
 set MINOR=
