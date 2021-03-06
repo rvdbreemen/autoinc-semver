@@ -10,8 +10,8 @@ rem Note: this script does not implement pre-release tagging at this point
 
 setlocal EnableDelayedExpansion
 
-rem To debug this script, just set to 1, and remove it when you are done. 
-set Debug=
+rem To debug this script, just set to 1
+set Debug=0
 
 rem test if Git is available, if so, use it to check in projects
 where git.exe >NUL 2>&1 && set GitAvailable=true\

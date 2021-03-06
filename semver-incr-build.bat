@@ -1,13 +1,14 @@
 @echo off
 rem 
-rem Copyright (c) 2020 Robert van den Breemen - released under MIT license - see the end of this file
+rem Copyright (c) 2021 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version : 0.1.5
+rem Version : 0.1.6
 rem 
 rem This script auto increment a header file, that can be included in your projects
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
 rem 0.1.2: this script does implement pre-release label
 rem 0.1.3: minor improvement and fixes
+rem 0.1.4: added githash
 
 setlocal EnableDelayedExpansion
 set FILE=%1
@@ -19,6 +20,9 @@ if [%1]==[] (
 	goto :eof
 )
 
+rem Fetch githash of current commit
+for /f "delims=" %%a in ('git rev-parse --short HEAD') do set GITHASH=%%a
+echo %GITHASH%
 rem Create local TZ timestamp
 for /f %%x in ('wmic path win32_localtime get /format:list ^| findstr "="') do set %%x
 rem Do you want UTC TZ timestamp, then use the next line instead
@@ -34,8 +38,8 @@ set Minute=0%Minute%
 set Minute=%Minute:~-2%
 set Second=0%Second%
 set Second=%Second:~-2%
-
 set TIMESTAMP=%Day%-%Month%-%Year%
+
 
 rem clear version numbers
 set MAJOR=
@@ -72,16 +76,17 @@ set /a MINOR=0
 set /a PATCH=0
 set /a BUILD=0
 set PRERELEASE=
+set GITHASH=
 
 :found-version
-set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
-if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%
+set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%-%BUILD%
+if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%-%BUILD%
 echo Found this version : [%VERSION%]
 
 rem now auto increment build number by 1
 set /a BUILD=BUILD+1
-set VERSION=%MAJOR%.%MINOR%.%PATCH%+%BUILD%
-if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%
+set VERSION=%MAJOR%.%MINOR%.%PATCH%+%GITHASH%-%BUILD%
+if defined PRERELEASE set VERSION=%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%+%BUILD%
 echo Increment build to : [%BUILD%]
 
   
@@ -91,16 +96,18 @@ echo #define _VERSION_MAJOR !MAJOR!>>!FILE!
 echo #define _VERSION_MINOR !MINOR!>>!FILE!  
 echo #define _VERSION_PATCH !PATCH!>>!FILE!
 echo #define _VERSION_BUILD !BUILD!>>!FILE!
+echo #define _VERSION_GITHASH !GITHASH!>>!FILE!
 if defined PRERELEASE (echo #define _VERSION_PRERELEASE !PRERELEASE!>>!FILE!) else (echo //#define _VERSION_PRERELEASE beta  //uncomment to define prerelease labels: alpha - beta - rc>>!FILE!)
 echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
 echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
 echo #define _SEMVER_CORE "%MAJOR%.%MINOR%.%PATCH%">>!FILE!
 echo #define _SEMVER_BUILD "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+
 if defined PRERELEASE (
   echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%BUILD%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
 ) else (
-  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%-%BUILD%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
 )
 echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
@@ -113,6 +120,7 @@ set MAJOR=
 set MINOR=
 set PATCH=
 set BUILD=
+set GITHASH=
 set PRERELEASE=
 set VERSION=
 set TIMESTAMP=
@@ -122,7 +130,7 @@ goto :eof
 rem =================================================================================
 rem MIT License
 rem 
-rem Copyright (c) 2020 Robert van den Breemen
+rem Copyright (c) 2021 Robert van den Breemen
 rem 
 rem Permission is hereby granted, free of charge, to any person obtaining a copy
 rem of this software and associated documentation files (the "Software"), to deal
