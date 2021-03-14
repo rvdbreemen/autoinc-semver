@@ -2,7 +2,7 @@
 rem 
 rem Copyright (c) 2021 Robert van den Breemen - released under MIT license - see the end of this file
 rem 
-rem Version : 0.1.7
+rem Version : 0.1.8
 rem 
 rem This script auto increment a header file, that can be included in your projects
 rem Using the format as described by Semantic Version 2.0 format (Read more https://semver.org/)
@@ -20,8 +20,13 @@ if [%1]==[] (
 	goto :eof
 )
 
-rem Fetch githash of current commit
-for /f "delims=" %%a in ('git rev-parse --short HEAD') do set GITHASH=%%a
+rem test if Git is available, if so, use it to check in projects
+where git.exe >NUL 2>&1 && set GitAvailable=true\
+if defined GitAvailable (
+  rem Fetch githash of current commit
+  for /f "delims=" %%a in ('git rev-parse --short HEAD') do set GITHASH=%%a
+)
+
 rem Create local TZ timestamp
 for /f %%x in ('wmic path win32_localtime get /format:list ^| findstr "="') do set %%x
 rem Do you want UTC TZ timestamp, then use the next line instead
@@ -101,15 +106,19 @@ echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
 echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
 echo #define _SEMVER_CORE "%MAJOR%.%MINOR%.%PATCH%">>!FILE!
 echo #define _SEMVER_BUILD "%MAJOR%.%MINOR%.%PATCH%+%BUILD%">>!FILE!
-echo #define _SEMVER_GITHASH "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%">>!FILE!
-
+set TMP=%BUILD%
+if defined GITHASH (
+  echo #define _SEMVER_GITHASH "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%">>!FILE!
+  set TMP=%GITHASH%
+) 
 if defined PRERELEASE (
-  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%GITHASH%">>!FILE!
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE%+%TMP%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH%-%PRERELEASE% (%TIMESTAMP%)">>!FILE!
 ) else (
-  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%GITHASH%">>!FILE!
+  echo #define _SEMVER_FULL "%MAJOR%.%MINOR%.%PATCH%+%TMP%">>!FILE!
   echo #define _SEMVER_NOBUILD "%MAJOR%.%MINOR%.%PATCH% (%TIMESTAMP%)">>!FILE!
 )
+set TMP= 
 echo #define _VERSION "%VERSION% (%TIMESTAMP%)">>!FILE!
 echo //The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver>>!FILE!
 
