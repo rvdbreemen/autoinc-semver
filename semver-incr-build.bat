@@ -100,7 +100,7 @@ echo #define _VERSION_MAJOR !MAJOR!>>!FILE!
 echo #define _VERSION_MINOR !MINOR!>>!FILE!  
 echo #define _VERSION_PATCH !PATCH!>>!FILE!
 echo #define _VERSION_BUILD !BUILD!>>!FILE!
-echo #define _VERSION_GITHASH !GITHASH!>>!FILE!
+echo #define _VERSION_GITHASH "!GITHASH!">>!FILE!
 if defined PRERELEASE (echo #define _VERSION_PRERELEASE !PRERELEASE!>>!FILE!) else (echo //#define _VERSION_PRERELEASE beta  //uncomment to define prerelease labels: alpha - beta - rc>>!FILE!)
 echo #define _VERSION_DATE "%TIMESTAMP%">>!FILE!
 echo #define _VERSION_TIME "%Hour%:%Minute%:%Second%">>!FILE!
