@@ -55,6 +55,13 @@ Change the scripts to your needs, it's up to you now.
 
 This script is released to enjoy!
 
+# update-version.py
+2024-04-17 After a couple of years I could not get the update-boiler-version.bat to work. Not sure what to do 
+I realized that maybe co-pilot & chatgpt could help me convert to Python. After about 1 hour of work and feeding
+my original batch script first. I created this script, it seems to do about the same as the batch file did before.
+It updates the relevant version information in the file headers of each relevant file. 
+
+Enjoy the script... 
 
 ```
 =================================================================================
