@@ -1,3 +1,12 @@
+# This script is part of the autoinc-semver project. 
+# It's used to automatically increment the build number
+# of a project following the Semantic Versioning (SemVer) specification. 
+# The script reads the current version from a version header file, 
+# increments the build number, and then writes the new version back to the file.
+# The version is in the format "MAJOR.MINOR.PATCH+BUILD", 
+# and each part is incremented independently.
+# The script also updates the timestamp to the current date and time.
+# More information about the project can be found at: https://github.com/rvdbreemen/autoinc-semver
 
 import os
 import re
@@ -47,24 +56,25 @@ def update_files(directory, version_info, ext_list):
         return
     print(f"DEBUG: Starting update_files with directory={directory}, version_info={version_info}, ext_list={ext_list}")
     for root, dirs, files in os.walk(directory):
-        print(f"DEBUG: Processing directory: {root}")
-        print(f"DEBUG: Subdirectories: {dirs}")
-        print(f"DEBUG: Files: {files}")
+        # print(f"DEBUG: Processing directory: {root}")
+        # print(f"DEBUG: Subdirectories: {dirs}")
+        # print(f"DEBUG: Files: {files}")
         for file in files:
             _, ext = os.path.splitext(file)
             if ext in ext_list:
-                print(f"DEBUG: Processing file: {file} with extension: {ext}")
+                # print(f"DEBUG: Processing file: {file} with extension: {ext}")
                 try:
                     update_version_in_file(os.path.join(root, file), version_info)
                     print(f"DEBUG: Successfully updated file: {file}")
                 except Exception as e:
                     print(f"ERROR: Failed to update file {file}. Error: {e}")
-            else:
-                print(f"DEBUG: Skipping file: {file} with extension: {ext}")
+    #        else:
+    #            print(f"DEBUG: Skipping file: {file} with extension: {ext}")
 
 def update_version_in_file(filepath, version_info):
     """ Replace the version string in the specified file. """
-    pre_version_text = r"(\*\*\s*Version\s*:\s*v)(\d+\.\d+\.\d+)"
+    # pre_version_text = r"^(\*\*\s*Version\s*:\s*v|\//\s*Version\s*:\s*v)(\d+\.\d+\.\d+)"
+    pre_version_text = r"((\*\*|//)\s*Version\s*:\s*v)(\d+\.\d+\.\d+)(.*)"
     version_pattern = re.compile(pre_version_text)
     new_version = f"{version_info['MAJOR']}.{version_info['MINOR']}.{version_info['PATCH']}"
     if 'PRERELEASE' in version_info:
@@ -96,7 +106,7 @@ def main(directory, filename, git_enabled):
     directory = os.path.abspath(directory)
     os.chdir(directory)
     version_info = parse_version_file(filename)
-    ext_list = ['.ino', '.h', '.c', '.cpp', '.js', '.css', '.html', '.inc']
+    ext_list = ['.ino', '.h', '.c', '.cpp', '.js', '.css', '.html', '.inc', '.cfg']
     print(f"DEBUG: Stacking directory: {directory}")
     print(f"DEBUG: Version Information: {version_info}")
     print(f"DEBUG: Extensions: {ext_list}")
