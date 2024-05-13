@@ -16,6 +16,7 @@ fi
 
 # Create timestamp
 TIMESTAMP=$(date '+%d/%m/%Y')
+TIMESTAMP_ISO=$(date '+%Y-%m-%d')
 Hour=$(date '+%H')
 Minute=$(date '+%M')
 Second=$(date '+%S')
@@ -23,6 +24,7 @@ Day=$(date '+%d')
 Month=$(date '+%m')
 Year=$(date '+%Y')
 echo "$TIMESTAMP"
+echo "$TIMESTAMP_ISO"
 
 # clear version numbers
 MAJOR=
@@ -80,10 +82,13 @@ echo "#define _VERSION_MINOR $MINOR">>$file
 echo "#define _VERSION_PATCH $PATCH">>$file
 echo "#define _VERSION_BUILD $BUILD">>$file
 echo "#define _VERSION_DATE \"$TIMESTAMP\"">>$file
+echo "#define _VERSION_DATE_ISO \"$TIMESTAMP_ISO\"">>$file
 echo "#define _VERSION_TIME \"$Hour:$Minute:$Second\"">>$file
 echo "#define _VERSION_ONLY \"$MAJOR.$MINOR.$PATCH\"">>$file
 echo "#define _VERSION_NOBUILD \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP)\"">>$file
+echo "#define _VERSION_NOBUILD_ISO \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP_ISO)\"">>$file
 echo "#define _VERSION \"$VERSION ($TIMESTAMP)\"">>$file
+echo "#define _VERSION_ISO \"$VERSION ($TIMESTAMP_ISO)\"">>$file
 echo "//The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver">>$file
 
 # clear version numbers
