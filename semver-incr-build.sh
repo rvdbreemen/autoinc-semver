@@ -76,20 +76,31 @@ echo "Increment build $BUILD"
 echo "Version is: $VERSION"
 
 # write the version numbers out to the file
-echo "//The version number conforms to semver.org format">$file
-echo "#define _VERSION_MAJOR ${MAJOR}">>$file
-echo "#define _VERSION_MINOR $MINOR">>$file
-echo "#define _VERSION_PATCH $PATCH">>$file
-echo "#define _VERSION_BUILD $BUILD">>$file
-echo "#define _VERSION_DATE \"$TIMESTAMP\"">>$file
-echo "#define _VERSION_DATE_ISO \"$TIMESTAMP_ISO\"">>$file
-echo "#define _VERSION_TIME \"$Hour:$Minute:$Second\"">>$file
-echo "#define _VERSION_ONLY \"$MAJOR.$MINOR.$PATCH\"">>$file
-echo "#define _VERSION_NOBUILD \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP)\"">>$file
-echo "#define _VERSION_NOBUILD_ISO \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP_ISO)\"">>$file
-echo "#define _VERSION \"$VERSION ($TIMESTAMP)\"">>$file
-echo "#define _VERSION_ISO \"$VERSION ($TIMESTAMP_ISO)\"">>$file
-echo "//The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver">>$file
+
+# remove the file before re-creating it.
+if [ -f "$file" ]; then
+    rm "$file"
+fi
+
+{
+  echo "#pragma once"
+  echo ""
+  echo "//The version number conforms to semver.org format"
+  echo "#define _VERSION_MAJOR ${MAJOR}"
+  echo "#define _VERSION_MINOR $MINOR"
+  echo "#define _VERSION_PATCH $PATCH"
+  echo "#define _VERSION_BUILD $BUILD"
+  echo "#define _VERSION_DATE \"$TIMESTAMP\""
+  echo "#define _VERSION_DATE_ISO \"$TIMESTAMP_ISO\""
+  echo "#define _VERSION_TIME \"$Hour:$Minute:$Second\""
+  echo "#define _VERSION_ONLY \"$MAJOR.$MINOR.$PATCH\""
+  echo "#define _VERSION_NOBUILD \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP)\""
+  echo "#define _VERSION_NOBUILD_ISO \"$MAJOR.$MINOR.$PATCH ($TIMESTAMP_ISO)\""
+  echo "#define _VERSION \"$VERSION ($TIMESTAMP)\""
+  echo "#define _VERSION_ISO \"$VERSION ($TIMESTAMP_ISO)\""
+  echo ""
+  echo "//The version information is created automatically, more information here: https://github.com/rvdbreemen/autoinc-semver"
+} > "$file"
 
 # clear version numbers
 MAJOR=
@@ -98,9 +109,9 @@ PATCH=
 BUILD=
 VERSION=
 TIMESTAMP=
-echo $VERSION
+echo "$VERSION"
 
-exit 1
+exit 0
 
 # MIT License
 #
