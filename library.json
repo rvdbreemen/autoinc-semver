@@ -1,0 +1,23 @@
+{
+  "name": "semver-incr-build",
+  "version": "0.1.9",
+  "description": "Automatic semantic version number generator",
+  "keywords": "c++, arduino, platformio, esp32, esp8266, semver, build",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rvdbreemen/autoinc-semver"
+  },
+  "authors": [
+    {
+      "name": "Robert van den Breemen (@rvdbreemen)",
+      "email": "robert@vandenbreemen.net",
+      "url": "https://github.com/rvdbreemen/autoinc-semver",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://www.helloworld.org/",
+  "dependencies": {},
+  "frameworks": "*",
+  "platforms": "*"
+}
