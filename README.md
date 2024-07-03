@@ -3,6 +3,7 @@
 Automatic semantic version number generator
 
 - [Usage](#usage)
+- [Using PlatformIO](#using-platformio)
 - [update-boiler-version](#update-boiler-version)
 - [update-version.py](#update-versionpy)
 
@@ -65,6 +66,51 @@ It comes down to this:
 1. Open the `platform.txt` in this directory: `C:\Users\<username>\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.7.1`
 2. Then add the following line to execute the script on each build:
    `recipe.hooks.sketch.prebuild.0.pattern=D:\<directory location of script>\autoinc-semver\semver-incr-build.bat {build.source.path}\version.h`
+
+## Using PlatformIO
+
+This library can be included in your `platformio.ini` file's `lib_deps` by pointing to the GitHub repo url.
+
+**☣️ Note that you should always use a verified tag after the `#` to help prevent supply-chain attacks! You can also use a trusted commit's SHA instead of a tag.**
+
+```ini
+# platformio.ini
+
+lib_deps =
+  https://github.com/rvdbreemen/autoinc-semver#0.1.9
+```
+
+To run the versioning script on pre-build, for example, use [`extra_scripts`](https://docs.platformio.org/en/latest/projectconf/sections/env/options/advanced/extra_scripts.html) as such:
+
+```ini
+# platformio.ini
+
+extra_scripts =
+  pre:pre_extra_script.py
+```
+
+Then, create a new `pre_extra_script.py` in your PlatformIO repo's root and use [pre/post actions](https://docs.platformio.org/en/latest/scripting/actions.html) and more.
+
+```python
+# pre_extra_script.py
+
+Import("env")
+
+print("\n🐍 Running extra scripts ...\n")
+
+BOARD_LIBDEPS_DIR = env["PROJECT_LIBDEPS_DIR"] + "/" + env["BOARD"]
+SEMVER_INCR_BUILD_SCRIPT = BOARD_LIBDEPS_DIR + "/semver-incr-build/semver-incr-build.sh"
+
+# Pre-build action
+def pre_build(source, target, env):
+    print("\n🐍 pre_build\n")
+
+    # Make executable first
+    env.Execute(f"chmod +x {SEMVER_INCR_BUILD_SCRIPT}")
+    env.Execute(f"{SEMVER_INCR_BUILD_SCRIPT} src/version.h")
+
+env.AddPreAction("$PROGPATH", pre_build)
+```
 
 ## update-boiler-version
 

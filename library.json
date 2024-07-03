@@ -1,6 +1,6 @@
 {
   "name": "semver-incr-build",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Automatic semantic version number generator",
   "keywords": "c++, arduino, platformio, esp32, esp8266, semver, build",
   "repository": {
@@ -17,9 +17,7 @@
   ],
   "license": "MIT",
   "homepage": "https://www.helloworld.org/",
-  "dependencies": {
-    "ownername/print": "~1.3.0"
-  },
+  "dependencies": {},
   "frameworks": "*",
   "platforms": "*"
 }
